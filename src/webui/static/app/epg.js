@@ -89,6 +89,10 @@ tvheadend.durationLookupRange = function(value) {
 tvheadend.epgDetails = function(event) {
 
     var content = '';
+    var duration = 0;
+
+    if (event.start && event.stop && event.stop - event.start > 0)
+        duration = (event.stop - event.start) / 1000;
 
     if (event.channelIcon != null && event.channelIcon.length > 0)
         content += '<img class="x-epg-chicon" src="' + event.channelIcon + '">';
@@ -100,13 +104,17 @@ tvheadend.epgDetails = function(event) {
     if (event.episodeOnscreen)
         content += '<div class="x-epg-title">' + event.episodeOnscreen + '</div>';
     if (event.start)
-      content += '<div class="x-epg-meta"><div class="x-epg-prefix">Start time:</div> ' + new Date(event.start).toLocaleString() + '</div>';
+      content += '<div class="x-epg-meta"><div class="x-epg-prefix">Start Time:</div> ' + tvheadend.niceDate(event.start) + '</div>';
     if (event.stop)
-      content += '<div class="x-epg-meta"><div class="x-epg-prefix">Stop time:</div> ' + new Date(event.stop).toLocaleString() + '</div>';
+      content += '<div class="x-epg-meta"><div class="x-epg-prefix">Stop Time:</div> ' + tvheadend.niceDate(event.stop) + '</div>';
+    if (duration)
+      content += '<div class="x-epg-meta"><div class="x-epg-prefix">Duration:</div> ' + parseInt(duration / 60) + ' min</div>';
     if (event.summary)
       content += '<div class="x-epg-summary">' + event.summary + '</div>';
     if (event.description)
       content += '<div class="x-epg-desc">' + event.description + '</div>';
+    if (event.starRating || event.ageRating || event.genre)
+      content += '<hr/>';
     if (event.starRating)
       content += '<div class="x-epg-meta"><div class="x-epg-prefix">Star Rating:</div> ' + event.starRating + '</div>';
     if (event.ageRating)
@@ -455,7 +463,7 @@ tvheadend.epg = function() {
             {
                 width: 100,
                 id: 'start',
-                header: "Start",
+                header: "Start Time",
                 dataIndex: 'start',
                 renderer: renderDate
             },
@@ -463,7 +471,7 @@ tvheadend.epg = function() {
                 width: 100,
                 hidden: true,
                 id: 'stop',
-                header: "End",
+                header: "End Time",
                 dataIndex: 'stop',
                 renderer: renderDate
             },
